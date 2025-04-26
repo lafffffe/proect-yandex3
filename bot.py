@@ -1,41 +1,25 @@
 import logging
-from telegram.ext import Application, MessageHandler, filters, CommandHandler, ConversationHandler
+from telegram.ext import Application, MessageHandler, filters, CommandHandler
 from telegram import ReplyKeyboardMarkup
-
-from dowland_video import download_tiktok_video_ytdlp
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
 )
+
 logger = logging.getLogger(__name__)
 
-# Состояния для ConversationHandler
-WAITING_FOR_TIKTOK_URL = 1
 
 async def pinterest(update, context):
     await update.message.reply_text("скинь ссылку на изображение pinterest")
 
+
 async def youtube(update, context):
     await update.message.reply_text("скинь ссылку на изображение youtube")
 
-async def tiktok(update, context):
-    await update.message.reply_text("📤 Отправьте ссылку на видео TikTok:")
-    return WAITING_FOR_TIKTOK_URL  # Переходим в состояние ожидания ссылки
 
-async def handle_tiktok_url(update, context):
-    url = update.message.text
-    await update.message.reply_text("⏳ Скачиваю видео...")
-    
-    try:
-        file_path = download_tiktok_video_ytdlp(url)
-        chat_id = update.effective_chat.id
-        
-        with open(file_path, 'rb') as file:
-            await context.bot.send_document(chat_id, document=file)
-    except Exception as e:
-        await update.message.reply_text(f"❌ Ошибка: {e}")
-    
-    return ConversationHandler.END  # Завершаем диалог
+async def tiktok(update, context):
+    await update.message.reply_text("скинь ссылку на изображение tiktok")
+
 
 async def start(update, context):
     user = update.effective_user
@@ -44,28 +28,23 @@ async def start(update, context):
         reply_markup=markup
     )
 
+
 async def help_command(update, context):
     await update.message.reply_text("Я пока не умею помогать...")
+
 
 def main():
     application = Application.builder().token('7801940292:AAEEDCLRZO0f4vzTJyzEgOMNSpxQWwB-k3Q').build()
 
-    # Обработчик команды /tiktok с ConversationHandler
-    tiktok_handler = ConversationHandler(
-        entry_points=[CommandHandler('tiktok', tiktok)],
-        states={
-            WAITING_FOR_TIKTOK_URL: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tiktok_url)],
-        },
-        fallbacks=[]
-    )
-
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
+
     application.add_handler(CommandHandler("pinterest", pinterest))
     application.add_handler(CommandHandler("youtube", youtube))
-    application.add_handler(tiktok_handler)  # Добавляем ConversationHandler для TikTok
+    application.add_handler(CommandHandler("tiktok", tiktok))
 
     application.run_polling()
+
 
 reply_keyboard = [['/pinterest', '/youtube', '/tiktok']]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
