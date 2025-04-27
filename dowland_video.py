@@ -49,7 +49,7 @@ def download_tiktok_photo(url, output_dir):
             f.write(img_data)
 
         print(f"✅ TikTok фото скачано: {filename}")
-        return filename
+        return img_data
 
     except Exception as e:
         print(f"❌ Ошибка: {e}")
@@ -61,7 +61,7 @@ def download_tiktok_video(url, output_dir):
     ydl_opts = {
         'format': 'best',
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
-        'quiet': True,
+        'quiet': True
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -86,7 +86,7 @@ def download_youtube_video(url, output_dir="downloads"):
         info = ydl.extract_info(url, download=True)
         filename = ydl.prepare_filename(info)
         print(f"✅ YouTube видео скачано: {filename}")
-        return filename
+        return info
 
 
 # ===== Pinterest =====
@@ -158,7 +158,7 @@ def download_pinterest_video(video_url, output_dir):
             f.write(video_data)
 
         print(f"✅ Pinterest видео скачано: {filename}")
-        return filename
+        return video_data
     except Exception as e:
         print(f"❌ Ошибка при скачивании видео: {e}")
         return None
@@ -175,7 +175,7 @@ def download_pinterest_photo(photo_url, output_dir):
             f.write(photo_data)
 
         print(f"✅ Pinterest фото скачано: {filename}")
-        return filename
+        return photo_data
     except Exception as e:
         print(f"❌ Ошибка при скачивании фото: {e}")
         return None
