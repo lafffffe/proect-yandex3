@@ -13,13 +13,14 @@ from bs4 import BeautifulSoup
 import re
 
 
-def get_pinterest_image_url(pin_url):
+def get_pinterest_image_url(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
 
     try:
-        response = requests.get(pin_url, headers=headers)
+        full_url = requests.head(url, allow_redirects=True).url
+        response = requests.get(full_url, headers=headers)
         response.raise_for_status()
         print(response.content)
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -34,8 +35,7 @@ def get_pinterest_image_url(pin_url):
         raise ValueError("Изображение не найдено")
 
     except Exception as e:
-        print(f"Ошибка: {e}")
-        return None
+        return ['error', f'❌ ошибка {e}, попробуйте еще раз']
 
 
 # Пример использования

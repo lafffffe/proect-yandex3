@@ -1,12 +1,7 @@
 import requests
 
-def get_tiktok_via_service(video_url):
-    response = requests.get(f"https://www.tikwm.com/api/?url={video_url}")
-    return response.json()['data']['play']
+url = 'https://vt.tiktok.com/ZShejXtvv/'
+full_url = requests.head(url, allow_redirects=True).url
+response = requests.get(f"https://www.tikwm.com/api/?url={full_url}")
 
-
-
-# Пример использования
-url = 'https://www.tiktok.com/@spasskaia_anastasia/video/7055209182353460481?is_from_webapp=1&sender_device=pc'
-direct_url = get_tiktok_via_service(url)
-print(direct_url)
+print(response.json()['data']['images'])
