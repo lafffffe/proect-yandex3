@@ -25,11 +25,10 @@ async def help_command(update, context):
     await update.message.reply_text("Я пока не умею помогать...")
 
 async def downloadLink(update, context):
-    link = update.message.text
-    filename = download_media(link)
-    with open(f'{filename}', "rb") as video_file:
-        await context.bot.send_video(chat_id=update.message.chat_id, video=video_file)
-
+    url = update.message.text
+    link = download_media(url)
+    if link[0] == 'photo': await context.bot.send_photo(update.message.chat_id, link[1])
+    elif link[0] == 'video': await context.bot.send_video(update.message.chat_id, link[1])
 
 def main():
     application = Application.builder().token('7801940292:AAEEDCLRZO0f4vzTJyzEgOMNSpxQWwB-k3Q').build()
