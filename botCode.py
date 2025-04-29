@@ -14,21 +14,27 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-
 async def start(update, context):
     user = update.effective_user
     await update.message.reply_html(
         rf"Привет {user.mention_html()}! Я умею скачивать видео по ссылке",
     )
 
+
 async def help_command(update, context):
     await update.message.reply_text("Я пока не умею помогать...")
+
 
 async def downloadLink(update, context):
     url = update.message.text
     link = download_media(url)
-    if link[0] == 'photo': await context.bot.send_photo(update.message.chat_id, link[1])
-    elif link[0] == 'video': await context.bot.send_video(update.message.chat_id, link[1])
+    if link[0] == 'photo':
+        await context.bot.send_photo(update.message.chat_id, link[1])
+    elif link[0] == 'video':
+        await context.bot.send_video(update.message.chat_id, link[1])
+    elif link[0] == 'error':
+        await context.bot.send_message(update.message.chat_id, link[1])
+
 
 def main():
     application = Application.builder().token('7801940292:AAEEDCLRZO0f4vzTJyzEgOMNSpxQWwB-k3Q').build()
@@ -38,6 +44,7 @@ def main():
     application.add_handler(MessageHandler(filters.TEXT, downloadLink))
 
     application.run_polling()
+
 
 if __name__ == '__main__':
     main()
