@@ -19,7 +19,7 @@ def get_tiktok_photoes_url(url):
     except Exception as e:
         return ['error', f'❌ ошибка {e}, попробуйте еще раз']
 
-# Пример использования
-url = 'https://www.tiktok.com/@spasskaia_anastasia/video/7055209182353460481?is_from_webapp=1&sender_device=pc'
-direct_url = get_tiktok_video_url(url)
-print(direct_url)
+# # Пример использования
+# url = 'https://www.tiktok.com/@spasskaia_anastasia/video/7055209182353460481?is_from_webapp=1&sender_device=pc'
+# direct_url = get_tiktok_video_url(url)
+# print(direct_url)

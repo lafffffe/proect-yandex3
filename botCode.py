@@ -2,9 +2,9 @@ import logging
 from gc import callbacks
 from pyexpat.errors import messages
 
-from telebot.types import InputMediaPhoto
-
+from telegram import InputMediaPhoto
 from telegram.ext import Application, MessageHandler, filters, CommandHandler
+from telegram.constants import ParseMode
 from telegram import ReplyKeyboardMarkup, Bot
 import requests
 from dowland_video import download_media
@@ -20,6 +20,7 @@ async def start(update, context):
     user = update.effective_user
     await update.message.reply_html(
         rf"Привет {user.mention_html()}! Я умею скачивать видео по ссылке",
+        reply_markup=None
     )
 
 
@@ -32,14 +33,19 @@ async def downloadLink(update, context):
     link = download_media(url)
     if link[0] == 'photo':
         await context.bot.send_photo(update.message.chat_id, link[1])
+
     elif link[0] == 'photoes':
-        media_group = [
-            InputMediaPhoto(media=url)
-            for i, url in enumerate(link[2])
-        ]
-        await context.bot.send_media_group(update.message.chat_id, media_group)
+        media_group = [InputMediaPhoto(url) for url in link[2]]
+        n = link[1]//10
+        ind = 0
+        for i in range(n):
+            await context.bot.send_media_group(update.message.chat_id, media_group[ind:ind+10])
+            ind += 10
+        await context.bot.send_media_group(update.message.chat_id, media_group[ind:])
+
     elif link[0] == 'video':
         await context.bot.send_video(update.message.chat_id, link[1])
+
     elif link[0] == 'error':
         await context.bot.send_message(update.message.chat_id, link[1])
 

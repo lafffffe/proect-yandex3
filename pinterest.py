@@ -38,7 +38,7 @@ def get_pinterest_image_url(url):
         return ['error', f'❌ ошибка {e}, попробуйте еще раз']
 
 
-# Пример использования
-pin_url = 'https://ru.pinterest.com/pin/1055390493930590965/'
-image_url = get_pinterest_image_url(pin_url)
-print(image_url)
+# # Пример использования
+# pin_url = 'https://ru.pinterest.com/pin/1055390493930590965/'
+# image_url = get_pinterest_image_url(pin_url)
+# print(image_url)
