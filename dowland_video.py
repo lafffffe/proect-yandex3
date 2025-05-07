@@ -1,17 +1,36 @@
-import yt_dlp
+import re
+import requests
+from bs4 import BeautifulSoup
+
+from pinterest import get_pinterest_media_url
+from tiktok import get_tiktok_video_url, get_tiktok_photoes_url
+from youtube import get_youtube_video_url
 
 
-def download_tiktok_video_ytdlp(url, output_path="C:\\Users\\dimag\\OneDrive\\Документы\\proect-yandex3\\files\\downloaded_video.mp4"):
-    ydl_opts = {
-        'outtmpl': output_path,  # Путь для сохранения
-        'format': 'best',  # Лучшее качество
-    }
+def download_tiktok_media(url):
+    response = requests.head(url, allow_redirects=True)
+    url = response.url
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-        print(f"Видео скачано: {output_path}")
-        return output_path
+    if "/photo/" in url:
+        return get_tiktok_photoes_url(url)
+    else:
+        return get_tiktok_video_url(url)
 
-# Пример использования
-#tiktok_url = "https://www.tiktok.com/@evvagner/video/7038602594289290498?is_from_webapp=1&sender_device=pc"
-#download_tiktok_video_ytdlp(tiktok_url)
+
+
+def download_pinterest_media(url):
+    link = get_pinterest_media_url(url)
+
+    return link
+
+
+def download_media(url):
+    """Определяет платформу и скачивает контент"""
+    if "youtube.com" in url or "youtu.be" in url:
+        return ['video', get_youtube_video_url(url)]
+    elif "tiktok.com" in url:
+        return download_tiktok_media(url)
+    elif "pinterest." in url or 'pin.it' in url:
+        return download_pinterest_media(url)
+    else:
+        return ['error', '❌ Неподдерживаемая платформа']

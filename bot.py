@@ -1,6 +1,13 @@
 import logging
+from gc import callbacks
+from pyexpat.errors import messages
+
+from telegram import InputMediaPhoto
 from telegram.ext import Application, MessageHandler, filters, CommandHandler
-from telegram import ReplyKeyboardMarkup
+from telegram.constants import ParseMode
+from telegram import ReplyKeyboardMarkup, Bot
+import requests
+from dowland_video import download_media
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -9,23 +16,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def pinterest(update, context):
-    await update.message.reply_text("скинь ссылку на изображение pinterest")
-
-
-async def youtube(update, context):
-    await update.message.reply_text("скинь ссылку на изображение youtube")
-
-
-async def tiktok(update, context):
-    await update.message.reply_text("скинь ссылку на изображение tiktok")
-
-
 async def start(update, context):
     user = update.effective_user
     await update.message.reply_html(
         rf"Привет {user.mention_html()}! Я умею скачивать видео по ссылке",
-        reply_markup=markup
+        reply_markup=None
     )
 
 
@@ -33,21 +28,37 @@ async def help_command(update, context):
     await update.message.reply_text("Я пока не умею помогать...")
 
 
+async def downloadLink(update, context):
+    url = update.message.text
+    link = download_media(url)
+    if link[0] == 'photo':
+        await context.bot.send_photo(update.message.chat_id, link[1])
+
+    elif link[0] == 'photoes':
+        media_group = [InputMediaPhoto(url) for url in link[2]]
+        n = link[1]//10
+        ind = 0
+        for i in range(n):
+            await context.bot.send_media_group(update.message.chat_id, media_group[ind:ind+10])
+            ind += 10
+        await context.bot.send_media_group(update.message.chat_id, media_group[ind:])
+
+    elif link[0] == 'video':
+        await context.bot.send_video(update.message.chat_id, link[1])
+
+    elif link[0] == 'error':
+        await context.bot.send_message(update.message.chat_id, link[1])
+
+
 def main():
     application = Application.builder().token('7801940292:AAEEDCLRZO0f4vzTJyzEgOMNSpxQWwB-k3Q').build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
-
-    application.add_handler(CommandHandler("pinterest", pinterest))
-    application.add_handler(CommandHandler("youtube", youtube))
-    application.add_handler(CommandHandler("tiktok", tiktok))
+    application.add_handler(MessageHandler(filters.TEXT, downloadLink))
 
     application.run_polling()
 
-
-reply_keyboard = [['/pinterest', '/youtube', '/tiktok']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 
 if __name__ == '__main__':
     main()
