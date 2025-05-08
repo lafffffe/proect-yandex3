@@ -36,7 +36,7 @@ async def downloadLink(update, context):
 
     elif link[0] == 'photoes':
         media_group = [InputMediaPhoto(url) for url in link[2]]
-        n = link[1]//10
+        n = link[1] // 10
         ind = 0
         for i in range(n):
             await context.bot.send_media_group(update.message.chat_id, media_group[ind:ind+10])

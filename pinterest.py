@@ -30,16 +30,16 @@ def get_pinterest_media_url(url):
 
         video_url = re.search(r'https?://[^"]+\.mp4', response.text)
         if video_url:
-            return [["video"] + [video_url.group(1).replace('\\', '')]]
+            return ["video", video_url.group(1).replace('\\', '')]
         
         # Если видео не найдено, ищем изображение
         meta_image = soup.find("meta", property="og:image")
         if meta_image:
-            return meta_image["content"]
+            return ["photo", meta_image["content"]]
 
         match = re.search(r'"images":\{"orig":\{"url":"(https:\\/\\/[^"]+)"', response.text)
         if match:
-            return [["photo"] + [match.group(1).replace("\\", "")]]
+            return ["photo", match.group(1).replace("\\", "")]
 
         raise ValueError("Изображение не найдено")
 
