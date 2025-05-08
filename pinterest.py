@@ -29,8 +29,10 @@ def get_pinterest_media_url(url):
         # Поиск видео URL в HTML
 
         video_url = re.search(r'https?://[^"]+\.mp4', response.text)
+        #print("###################"* 10)
+        #print(video_url[0])
         if video_url:
-            return ["video", video_url.group(1).replace('\\', '')]
+            return ["video", video_url[0]]
         
         # Если видео не найдено, ищем изображение
         meta_image = soup.find("meta", property="og:image")
@@ -46,8 +48,7 @@ def get_pinterest_media_url(url):
     except Exception as e:
         return ['error', f'❌ ошибка {e}, попробуйте еще раз']
 
-
-# # Пример использования
+#print(get_pinterest_media_url("https://pin.it/2D0ZpeFMb"))
 # pin_url = 'https://ru.pinterest.com/pin/1055390493930590965/'
 # image_url = get_pinterest_image_url(pin_url)
 # print(image_url)
