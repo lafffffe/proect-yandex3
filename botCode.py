@@ -50,6 +50,9 @@ async def downloadLink(update, context):
         print(link[1])
         await context.bot.send_video(update.message.chat_id, link[1])
 
+    elif link[0] == 'audio':
+        await context.bot.send_audio(update.message.chat_id, link[1])
+
     elif link[0] == 'error':
         await context.bot.send_message(update.message.chat_id, link[1])
 
