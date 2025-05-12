@@ -9,7 +9,7 @@ from telegram import ReplyKeyboardMarkup, Bot
 import requests
 from dowland_video import download_media
 
-with open('api_key.txt', 'r') as file:
+with open('apiBot.txt', 'r') as file:
     tokenBot = file.readline().strip()
 
 logging.basicConfig(
@@ -52,6 +52,10 @@ async def downloadLink(update, context):
 
     elif link[0] == 'audio':
         await context.bot.send_audio(update.message.chat_id, link[1])
+
+    elif link[0] == 'audios':
+        for i in range(link[1]):
+            await context.bot.send_voice(update.message.chat_id, link[2+i])
 
     elif link[0] == 'error':
         await context.bot.send_message(update.message.chat_id, link[1])
