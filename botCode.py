@@ -9,6 +9,9 @@ from telegram import ReplyKeyboardMarkup, Bot
 import requests
 from dowland_video import download_media
 
+with open('api_key.txt', 'r') as file:
+    tokenBot = file.readline().strip()
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
 )
@@ -44,6 +47,7 @@ async def downloadLink(update, context):
         await context.bot.send_media_group(update.message.chat_id, media_group[ind:])
 
     elif link[0] == 'video':
+        print(link[1])
         await context.bot.send_video(update.message.chat_id, link[1])
 
     elif link[0] == 'error':
@@ -51,7 +55,7 @@ async def downloadLink(update, context):
 
 
 def main():
-    application = Application.builder().token('7801940292:AAEEDCLRZO0f4vzTJyzEgOMNSpxQWwB-k3Q').build()
+    application = Application.builder().token(tokenBot).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))

@@ -1,7 +1,11 @@
 import yt_dlp
+import requests
 
 
 def get_youtube_video_url(url):
+
+    response = requests.head(url, allow_redirects=True)
+    url = response.url
 
     ydl_opts = {
         'format': 'best',
@@ -10,7 +14,9 @@ def get_youtube_video_url(url):
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        print(info)
+        print('#############' * 15)
+        print(url)
+        info = ydl.extract_info(url, download=True)
+        print()
+        print('#############' * 15)
         return ['video', info]
-
