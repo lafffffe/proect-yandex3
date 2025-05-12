@@ -10,6 +10,9 @@ def get_rutube_video_url(url):
 
     response = requests.get(url, headers=headers)
     html_content = response.text
+    print("################" * 10)
+    print(html_content)
+    print()
     try:
         # Метод 1: Поиск JSON-конфига
         pattern = re.compile(r'window\.config\s*=\s*({.*?});', re.DOTALL)
