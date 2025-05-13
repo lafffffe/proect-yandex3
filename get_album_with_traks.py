@@ -1,11 +1,12 @@
 import os
-
+import re
 from yandex_music import Client
 
 # без авторизации недоступен список треков альбома
 TOKEN = os.environ.get('y0__xCgg-f6Bhje-AYgnZedjBOrjl44G004DFTLubtv0VE_ced6Pg')
-url = 'https://music.yandex.ru/album/22200537/track/103651762?utm_medium=copy_link'
-ALBUM_ID = url.split('/')[4]
+url = 'https://music.yandex.ru/album/35098588?utm_medium=copy_linkk'
+match = re.search(r'\/album\/(\d+)', url)
+ALBUM_ID = match.group(1)
 print(ALBUM_ID)
 
 client = Client(TOKEN).init()
@@ -29,10 +30,10 @@ if cover:
 text += 'Список треков:'
 
 print(text)
+list = []
 
 for track in tracks:
-    print(track.download_info)
-    print('#########################################################')
+    list += [track.id]
     if isinstance(track, str):
         print(track)
     else:
@@ -40,3 +41,7 @@ for track in tracks:
         if track.artists:
             artists = ' - ' + ', '.join(artist.name for artist in track.artists)
         print(track.title + artists)
+print(list)
+for id in list:
+    url2 = f'https://music.yandex.ru/album/{ALBUM_ID}/track/{id}?utm_medium=copy_link'
+    print(url2)
