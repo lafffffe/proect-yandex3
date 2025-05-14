@@ -5,24 +5,23 @@ token = 'y0__xCDkqbMBBje-AYgk_eljBO3d4-yyfOq5NZXPCSgy375V2x-ww'
 client = Client(token).init()
 
 
-def blablabla(url, artists, title, duration):
+def blablabla(url, artists, title):
 
     pattern = r'\/track\/(\d+)'
     match = re.search(pattern, url)
     trackID = match.group(1)
-    print(trackID)
     mp3 = client.tracksDownloadInfo(track_id=trackID, get_direct_links=True)[0]['direct_link']
-    print(mp3)
     #return mp3
-    send_renamed_mp3(mp3, artists, title, duration)
+    return send_renamed_mp3(mp3, artists, title)
 
 
 def get_yandex_audio(url):
 
-    if 'album' in url:
+    if 'track' in url:
+        return  ['audio', *blablabla(url, "ddd", "fff")]
+    elif 'album' in url:
         match = re.search(r'\/album\/(\d+)', url)
         ALBUM_ID = match.group(1)
-        print(ALBUM_ID)
         list = []
 
         album = client.albums_with_tracks(ALBUM_ID)
@@ -33,23 +32,19 @@ def get_yandex_audio(url):
             tracks += volume
 
         for track in tracks:
-            list += [track.id, track.artists, track.title, track.duration]
+            list += [(track.id, track.artists[0].name, track.title)]
+            '''
             if isinstance(track, str):
                 print(track)
             else:
                 artists = ''
                 if track.artists:
                     artists = ' - ' + ', '.join(artist.name for artist in track.artists)
-                print(track.title + artists)
-
-    elif 'track' in url:
-        return  ['audio', blablabla(url, )]
-
-        print(list)
+                print(track.title + artists)'''
         res = ['audios', len(list)]
-        for id in list:
-            url2 = f'https://music.yandex.ru/album/{ALBUM_ID}/track/{id[0]}?utm_medium=copy_link'
-            res.append(blablabla(url2, list[1], list[2], list[3]))
+        for i in range(len(list)):
+            url2 = f'https://music.yandex.ru/album/{ALBUM_ID}/track/{list[i][0]}?utm_medium=copy_link'
+            res += [blablabla(url2, list[i][1], list[i][2])]
         return res
 
 
@@ -57,13 +52,12 @@ import requests
 import os
 from io import BytesIO
 
-def send_renamed_mp3(mp3, artists, title, duration):
+def send_renamed_mp3(mp3, artists, title):
     
     # Произвольные метаданные
     custom_filename = title
     title = title
     artist = artists
-    duration = duration
     
     # Скачиваем файл в оперативную память (без сохранения на диск)
     response = requests.get(mp3)
@@ -72,11 +66,12 @@ def send_renamed_mp3(mp3, artists, title, duration):
     # Создаем файловый объект в памяти
     audio_file = BytesIO(response.content)
     audio_file.name = custom_filename  # Важно для имени при скачивании
+    #audio_file2 = audio_file
 
     # Закрываем файловый объект (память очистится автоматически)
-    if 'audio_file' in locals():
-        audio_file.close()
-    return audio_file, custom_filename, title, artist, duration
+    #if 'audio_file' in locals():
+    #    audio_file.close()
+    return audio_file, custom_filename, title, artist
 
 
 # TOKEN = os.environ.get('y0__xCgg-f6Bhje-AYgnZedjBOrjl44G004DFTLubtv0VE_ced6Pg')

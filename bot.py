@@ -3,7 +3,7 @@ from gc import callbacks
 from pyexpat.errors import messages
 
 from telegram import InputMediaPhoto, InputFile
-from telegram.ext import Application, MessageHandler, filters, CommandHandler
+from telegram.ext import Application, MessageHandler, filters, CommandHandler, ApplicationBuilder
 from telegram.constants import ParseMode
 from telegram import ReplyKeyboardMarkup, Bot
 import requests
@@ -85,26 +85,43 @@ async def downloadLink(update, context):
         custom_filename = link[2]
         title = link[3]
         artist = link[4]
-        duration = link[5]
+
         await context.bot.send_audio(
             chat_id=update.message.chat_id,
             audio=InputFile(audio_file, filename=custom_filename),
             title=title,
             performer=artist,
-            duration=duration  # Можно указать реальную длину, если известна
+            duration=0  # Можно указать реальную длину, если известна
         )
+        if 'audio_file' in locals():
+            audio_file.close()
 
 
     elif link[0] == 'audios':
-        for i in range(link[1]):
-            await context.bot.send_voice(update.message.chat_id, link[2+i])
+        print(link)
+        
+        for i in range(2, link[1] + 2):
+            audio_file = link[i][0]
+            custom_filename = link[i][1]
+            title = link[i][2]
+            artist = link[i][3]
+
+            await context.bot.send_audio(
+                chat_id=update.message.chat_id,
+                audio=InputFile(audio_file, filename=custom_filename),
+                title=title,
+                performer=artist,
+                duration=0  # Можно указать реальную длину, если известна
+            )
+
 
     elif link[0] == 'error':
         await context.bot.send_message(update.message.chat_id, link[1])
 
 
 def main():
-    application = Application.builder().token(tokenBot).build()
+    #application = Application.builder().token(tokenBot).build()
+    application = ApplicationBuilder().token(tokenBot).read_timeout(30).write_timeout(30).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
