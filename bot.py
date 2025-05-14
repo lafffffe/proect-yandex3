@@ -77,7 +77,7 @@ async def downloadLink(update, context):
         await context.bot.send_media_group(update.message.chat_id, media_group[ind:])
 
     elif link[0] == 'video':
-        print(link[1])
+
         await context.bot.send_video(update.message.chat_id, link[1])
 
     elif link[0] == 'audio':
@@ -98,7 +98,6 @@ async def downloadLink(update, context):
 
 
     elif link[0] == 'audios':
-        print(link)
         
         for i in range(2, link[1] + 2):
             audio_file = link[i][0]
@@ -113,6 +112,27 @@ async def downloadLink(update, context):
                 performer=artist,
                 duration=0  # Можно указать реальную длину, если известна
             )
+            if 'audio_file' in locals():
+                audio_file.close()
+
+    elif link[0] == "audios_pl":
+
+        for i in range(2, link[1] + 3):
+
+            audio_file = link[i][0]
+            custom_filename = link[i][1]
+            title = link[i][2]
+            artist = link[i][3]
+
+            await context.bot.send_audio(
+            chat_id=update.message.chat_id,
+            audio=InputFile(audio_file, filename=custom_filename),
+            title=title,
+            performer=artist,
+            duration=0  # Можно указать реальную длину, если известна
+            )
+        if 'audio_file' in locals():
+            audio_file.close()
 
 
     elif link[0] == 'error':
@@ -121,7 +141,7 @@ async def downloadLink(update, context):
 
 def main():
     #application = Application.builder().token(tokenBot).build()
-    application = ApplicationBuilder().token(tokenBot).read_timeout(30).write_timeout(30).build()
+    application = ApplicationBuilder().token(tokenBot).read_timeout(50).write_timeout(50).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))

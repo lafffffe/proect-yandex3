@@ -1,5 +1,6 @@
 from yandex_music import Client
 import re, requests, os
+import time
 
 token = 'y0__xCDkqbMBBje-AYgk_eljBO3d4-yyfOq5NZXPCSgy375V2x-ww'
 client = Client(token).init()
@@ -18,7 +19,25 @@ def blablabla(url, artists, title):
 def get_yandex_audio(url):
 
     if 'track' in url:
-        return  ['audio', *blablabla(url, "ddd", "fff")]
+        match = re.search(r'\/album\/(\d+)', url)
+        ALBUM_ID = match.group(1)
+
+        album = client.albums_with_tracks(ALBUM_ID)
+
+        pattern = r'\/track\/(\d+)'
+        match = re.search(pattern, url)
+        trackID = match.group(1)
+
+        artist = 'name'
+        title = 'music'
+
+        for i, volume in enumerate(album.volumes):
+            if volume[0].id == trackID:
+                artist = volume[0].artists[0].name
+                title = volume[0].title
+                break
+
+        return  ['audio', *blablabla(url, artist, title)]
     elif 'album' in url:
         match = re.search(r'\/album\/(\d+)', url)
         ALBUM_ID = match.group(1)
@@ -46,6 +65,43 @@ def get_yandex_audio(url):
             url2 = f'https://music.yandex.ru/album/{ALBUM_ID}/track/{list[i][0]}?utm_medium=copy_link'
             res += [blablabla(url2, list[i][1], list[i][2])]
         return res
+    
+    elif 'playlist' in url:
+        token = 'y0__xCDkqbMBBje-AYgk_eljBO3d4-yyfOq5NZXPCSgy375V2x-ww'
+        client = Client(token).init()
+        parts = url.split('/')
+        username = parts[4]
+        playlist_id = parts[6].split('?')[0]
+        # Получаем плейлист через новый API метод
+        playlist = client.users_playlists(playlist_id, user_id=username)
+
+        if not playlist:
+            raise Exception("Плейлист не найден или доступ запрещен")
+
+        # Получаем полную информацию о треках
+        track_ids = [track.track_id for track in playlist.tracks]
+        tracks = client.tracks(track_ids)
+        res = []
+        for track in tracks:
+            try:
+                time.sleep(1)
+                download_info = track.get_download_info()
+                mp3_info = next((i for i in download_info if i.codec == 'mp3'), None)
+
+                # Получаем прямую ссылку
+                mp3_url = mp3_info.get_direct_link()
+
+                res += [send_renamed_mp3(mp3_url, track.artists[0]["name"], track.title)]
+
+            except yandex_music.exceptions.UnauthorizedError:
+                print("Ошибка авторизации. Пробуем переподключиться...")
+                client = Client(token).init()  # Переавторизация
+                continue
+            except Exception as e:
+                print(f"Ошибка при обработке трека: {e}")
+                continue
+        return ["audios_pl", len(res) - 1] + res
+
 
 
 import requests
