@@ -1,5 +1,5 @@
 from yandex_music import Client
-import re, requests, os
+import re, requests, os, yandex_music
 import time
 
 token = 'y0__xCDkqbMBBje-AYgk_eljBO3d4-yyfOq5NZXPCSgy375V2x-ww'
@@ -17,6 +17,8 @@ def blablabla(url, artists, title):
 
 
 def get_yandex_audio(url):
+    token = 'y0__xCDkqbMBBje-AYgk_eljBO3d4-yyfOq5NZXPCSgy375V2x-ww'
+    client = Client(token).init()
 
     if 'track' in url:
         match = re.search(r'\/album\/(\d+)', url)
@@ -38,6 +40,7 @@ def get_yandex_audio(url):
                 break
 
         return  ['audio', *blablabla(url, artist, title)]
+    
     elif 'album' in url:
         match = re.search(r'\/album\/(\d+)', url)
         ALBUM_ID = match.group(1)
@@ -45,6 +48,7 @@ def get_yandex_audio(url):
 
         album = client.albums_with_tracks(ALBUM_ID)
         tracks = []
+
         for i, volume in enumerate(album.volumes):
             if len(album.volumes) > 1:
                 tracks.append(f'💿 Диск {i + 1}')
@@ -52,14 +56,7 @@ def get_yandex_audio(url):
 
         for track in tracks:
             list += [(track.id, track.artists[0].name, track.title)]
-            '''
-            if isinstance(track, str):
-                print(track)
-            else:
-                artists = ''
-                if track.artists:
-                    artists = ' - ' + ', '.join(artist.name for artist in track.artists)
-                print(track.title + artists)'''
+
         res = ['audios', len(list)]
         for i in range(len(list)):
             url2 = f'https://music.yandex.ru/album/{ALBUM_ID}/track/{list[i][0]}?utm_medium=copy_link'
@@ -67,8 +64,7 @@ def get_yandex_audio(url):
         return res
     
     elif 'playlist' in url:
-        token = 'y0__xCDkqbMBBje-AYgk_eljBO3d4-yyfOq5NZXPCSgy375V2x-ww'
-        client = Client(token).init()
+
         parts = url.split('/')
         username = parts[4]
         playlist_id = parts[6].split('?')[0]

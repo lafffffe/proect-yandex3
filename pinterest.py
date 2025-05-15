@@ -15,7 +15,8 @@ import re
 
 def get_pinterest_media_url(url):
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/91.0.4472.124 Safari/537.36"
     }
 
     try:
@@ -29,8 +30,7 @@ def get_pinterest_media_url(url):
         # Поиск видео URL в HTML
 
         video_url = re.search(r'https?://[^"]+\.mp4', response.text)
-        #print("###################"* 10)
-        #print(video_url[0])
+
         if video_url:
             return ["video", video_url[0]]
         
@@ -52,3 +52,6 @@ def get_pinterest_media_url(url):
 # pin_url = 'https://ru.pinterest.com/pin/1055390493930590965/'
 # image_url = get_pinterest_image_url(pin_url)
 # print(image_url)
+
+f = open('ndkkmhtkm', 'r')
+a = f.readlines()
